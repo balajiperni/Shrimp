@@ -1,10 +1,3 @@
-/**
- * Shrimp Count Detector — Frontend Application
- * Handles image upload, detection API calls, and result display
- */
-
-// ─── DOM Elements ────────────────────────────────────────────────────────────
-
 const elements = {
     uploadArea: document.getElementById('uploadArea'),
     uploadContent: document.getElementById('uploadContent'),

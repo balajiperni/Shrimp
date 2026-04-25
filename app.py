@@ -1,8 +1,3 @@
-"""
-Shrimp Count Detection API
-YOLOv8-based shrimp detection and counting service
-"""
-
 import os
 import io
 import uuid
@@ -168,11 +163,14 @@ async def detect_shrimp(file: UploadFile = File(...)):
 
         # Draw label background
         label = f"{det['class']} {conf:.2f}"
-        (label_w, label_h), _ = cv2.getFontScale(cv2.FONT_HERSHEY_SIMPLEX, 0.6, thickness=2)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.6
+        font_thickness = 2
+        (label_w, label_h), baseline = cv2.getTextSize(label, font, font_scale, font_thickness)
         cv2.rectangle(
             annotated_img,
-            (x1, y1 - label_h - 10),
-            (x1 + label_w + 10, y1),
+            (x1, y1 - label_h - baseline - 6),
+            (x1 + label_w + 6, y1),
             (0, 255, 127),
             -1,
         )
@@ -181,25 +179,28 @@ async def detect_shrimp(file: UploadFile = File(...)):
         cv2.putText(
             annotated_img,
             label,
-            (x1 + 5, y1 - 5),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
+            (x1 + 3, y1 - baseline - 3),
+            font,
+            font_scale,
             (0, 0, 0),
-            2,
+            font_thickness,
         )
 
     # Add count overlay at top
     count_text = f"Shrimp Count: {len(detections)}"
-    (ct_w, ct_h), _ = cv2.getFontScale(cv2.FONT_HERSHEY_SIMPLEX, 1.2, thickness=3)
-    cv2.rectangle(annotated_img, (10, 10), (ct_w + 30, ct_h + 30), (0, 0, 0), -1)
+    count_font = cv2.FONT_HERSHEY_SIMPLEX
+    count_scale = 1.2
+    count_thickness = 3
+    (ct_w, ct_h), ct_baseline = cv2.getTextSize(count_text, count_font, count_scale, count_thickness)
+    cv2.rectangle(annotated_img, (10, 10), (ct_w + 30, ct_h + ct_baseline + 30), (0, 0, 0), -1)
     cv2.putText(
         annotated_img,
         count_text,
         (20, ct_h + 20),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1.2,
+        count_font,
+        count_scale,
         (0, 255, 127),
-        3,
+        count_thickness,
     )
 
     # Save annotated image
