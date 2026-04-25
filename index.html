@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shrimp Count Detector — YOLOv8</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦐</text></svg>">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon">🦐</span>
+            <span class="nav-title">ShrimpDetector</span>
+        </div>
+        <div class="nav-links">
+            <a href="#detect" class="nav-link active">Detect</a>
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+            <a href="#about" class="nav-link">About</a>
+        </div>
+        <div class="nav-status">
+            <span class="status-dot"></span>
+            <span class="status-text">Model Ready</span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">YOLOv8 Powered</div>
+            <h1 class="hero-title">Shrimp Count<br><span class="gradient-text">Detection</span></h1>
+            <p class="hero-subtitle">Upload an image and get instant shrimp detection with bounding boxes, confidence scores, and accurate counts using state-of-the-art YOLOv8 object detection.</p>
+            <a href="#detect" class="hero-cta">
+                <span>Start Detecting</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+            </a>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-card">
+                <div class="card-header">
+                    <span class="card-dot red"></span>
+                    <span class="card-dot yellow"></span>
+                    <span class="card-dot green"></span>
+                </div>
+                <div class="card-body">
+                    <div class="detection-demo">
+                        <div class="demo-box">
+                            <span class="demo-label">shrimp 0.94</span>
+                        </div>
+                        <div class="demo-box" style="top:55%;left:35%;width:80px;height:55px">
+                            <span class="demo-label">shrimp 0.89</span>
+                        </div>
+                        <div class="demo-box" style="top:30%;left:65%;width:70px;height:50px">
+                            <span class="demo-label">shrimp 0.91</span>
+                        </div>
+                    </div>
+                    <div class="demo-result">
+                        <span class="result-label">Detected</span>
+                        <span class="result-value">3 Shrimp</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detection Section -->
+    <section id="detect" class="detect-section">
+        <div class="section-header">
+            <span class="section-badge">Detection</span>
+            <h2 class="section-title">Upload & Detect</h2>
+            <p class="section-subtitle">Drop your shrimp image below and let YOLOv8 do the counting</p>
+        </div>
+
+        <div class="detect-container">
+            <!-- Upload Area -->
+            <div class="upload-panel" id="uploadPanel">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content" id="uploadContent">
+                        <div class="upload-icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </div>
+                        <h3 class="upload-title">Drop your image here</h3>
+                        <p class="upload-subtitle">or click to browse files</p>
+                        <div class="upload-formats">JPG, PNG, BMP, WebP — Max 10 MB</div>
+                    </div>
+                    <div class="upload-preview" id="uploadPreview" style="display:none;">
+                        <img id="previewImage" src="" alt="Preview">
+                        <div class="preview-overlay">
+                            <button class="preview-change-btn" id="changeImageBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                Change Image
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.bmp,.webp" hidden>
+                </div>
+
+                <!-- Detection Settings -->
+                <div class="detection-settings">
+                    <div class="setting-item">
+                        <label class="setting-label">Confidence Threshold</label>
+                        <div class="setting-control">
+                            <input type="range" id="confidenceSlider" min="0.1" max="0.9" step="0.05" value="0.25" class="slider">
+                            <span class="setting-value" id="confidenceValue">0.25</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="detect-btn" id="detectBtn" disabled>
+                    <span class="btn-content" id="btnContent">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        Detect Shrimp
+                    </span>
+                    <span class="btn-loading" id="btnLoading" style="display:none;">
+                        <div class="spinner"></div>
+                        Detecting...
+                    </span>
+                </button>
+            </div>
+
+            <!-- Result Area -->
+            <div class="result-panel" id="resultPanel">
+                <div class="result-placeholder" id="resultPlaceholder">
+                    <div class="placeholder-icon">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    </div>
+                    <h3>Detection Results</h3>
+                    <p>Upload an image and click detect to see results here</p>
+                </div>
+
+                <div class="result-content" id="resultContent" style="display:none;">
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card primary">
+                            <div class="stat-icon">🦐</div>
+                            <div class="stat-info">
+                                <span class="stat-label">Shrimp Count</span>
+                                <span class="stat-value" id="shrimpCount">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-info">
+                                <span class="stat-label">Avg Confidence</span>
+                                <span class="stat-value" id="avgConfidence">0%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-info">
+                                <span class="stat-label">Processing Time</span>
+                                <span class="stat-value" id="processingTime">0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Annotated Image -->
+                    <div class="result-image-container">
+                        <h3 class="result-section-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                            Annotated Image
+                        </h3>
+                        <div class="image-wrapper">
+                            <img id="annotatedImage" src="" alt="Detection Result">
+                        </div>
+                    </div>
+
+                    <!-- Detection Details -->
+                    <div class="detection-details">
+                        <h3 class="result-section-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Detection Details
+                        </h3>
+                        <div class="detections-table-container">
+                            <table class="detections-table" id="detectionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Class</th>
+                                        <th>Confidence</th>
+                                        <th>Position</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detectionsBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Download Button -->
+                    <button class="download-btn" id="downloadBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download Annotated Image
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-section">
+        <div class="section-header">
+            <span class="section-badge">Process</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Three simple steps to get your shrimp count</p>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <div class="step-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <h3 class="step-title">Upload Image</h3>
+                <p class="step-desc">Drag and drop or click to upload a photo of shrimp. Supports JPG, PNG, BMP, and WebP formats up to 10 MB.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <div class="step-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                </div>
+                <h3 class="step-title">AI Detection</h3>
+                <p class="step-desc">Our YOLOv8 model analyzes the image, identifies each shrimp with bounding boxes, and calculates confidence scores for every detection.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <div class="step-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <h3 class="step-title">Get Results</h3>
+                <p class="step-desc">View the annotated image with bounding boxes, shrimp count, confidence scores, and download the result image for your records.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="section-header">
+            <span class="section-badge">About</span>
+            <h2 class="section-title">About This Project</h2>
+            <p class="section-subtitle">Technical details about the shrimp detection system</p>
+        </div>
+
+        <div class="about-grid">
+            <div class="about-card">
+                <h3>Model Architecture</h3>
+                <p>This application uses <strong>YOLOv8</strong>, the latest generation of the You Only Look Once object detection architecture. YOLOv8 delivers state-of-the-art accuracy while maintaining real-time inference speed, making it ideal for counting tasks in aquaculture and marine research.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">YOLOv8</span>
+                    <span class="tech-tag">PyTorch</span>
+                    <span class="tech-tag">Ultralytics</span>
+                </div>
+            </div>
+            <div class="about-card">
+                <h3>Backend Stack</h3>
+                <p>Built with <strong>FastAPI</strong> for high-performance async API endpoints. The model runs server-side with GPU acceleration when available, falling back to CPU inference. OpenCV handles image processing and annotation drawing for the output visualizations.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">FastAPI</span>
+                    <span class="tech-tag">OpenCV</span>
+                    <span class="tech-tag">Python 3.11</span>
+                </div>
+            </div>
+            <div class="about-card">
+                <h3>Use Cases</h3>
+                <p>Designed for <strong>aquaculture farms</strong> needing automated shrimp counting, <strong>marine researchers</strong> studying population dynamics, and <strong>quality control</strong> in shrimp processing facilities. The system can process batch images for farm-wide monitoring and reporting.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">Aquaculture</span>
+                    <span class="tech-tag">Marine Research</span>
+                    <span class="tech-tag">Quality Control</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="footer-icon">🦐</span>
+                <span>ShrimpDetector</span>
+            </div>
+            <p class="footer-text">YOLOv8-based shrimp detection and counting system</p>
+            <div class="footer-links">
+                <a href="https://github.com" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon"></span>
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
